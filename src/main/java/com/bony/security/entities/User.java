@@ -1,4 +1,4 @@
-package com.bony.security.user;
+package com.bony.security.entities;
 
 
 import jakarta.persistence.*;
