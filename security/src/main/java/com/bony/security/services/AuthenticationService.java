@@ -3,8 +3,8 @@ package com.bony.security.services;
 import com.bony.security.controller.AuthenticationRequest;
 import com.bony.security.controller.AuthenticationResponse;
 import com.bony.security.controller.RegisterRequest;
-import com.bony.security.entities.Role;
-import com.bony.security.entities.User;
+import com.bony.security.model.Role;
+import com.bony.security.model.User;
 import com.bony.security.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -34,6 +34,8 @@ public class AuthenticationService {
 
         return AuthenticationResponse.builder()
                 .token(jwtToken)
+                .email(user.getEmail())
+                .id(Long.valueOf(user.getId()))
                 .build();
     }
 
@@ -51,6 +53,8 @@ public class AuthenticationService {
 
         return AuthenticationResponse.builder()
                 .token(jwtToken)
+                .email(user.getEmail())
+                .id(Long.valueOf(user.getId()))
                 .build();
     }
 }
