@@ -12,6 +12,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class AuthenticationService {
@@ -35,7 +37,7 @@ public class AuthenticationService {
         return AuthenticationResponse.builder()
                 .token(jwtToken)
                 .email(user.getEmail())
-                .id(Long.valueOf(user.getId()))
+                .id(user.getId())
                 .build();
     }
 
@@ -47,14 +49,53 @@ public class AuthenticationService {
                 )
         );
 
-        var user =repository.findByEmail(request.getEmail())
+        var user = repository.findByEmail(request.getEmail())
                 .orElseThrow();
         var jwtToken = jwtService.generateToken(user);
 
         return AuthenticationResponse.builder()
                 .token(jwtToken)
                 .email(user.getEmail())
-                .id(Long.valueOf(user.getId()))
+                .id(user.getId())
                 .build();
+    }
+
+    public List<User> getAllUsers() {
+        return repository.findAll();
+    }
+
+    public User getUser(Long id) {
+        return repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+    }
+
+    public User updateUser(Long id, User updatedUser, Long currentUserId) {
+        User user = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (!user.getId().equals(currentUserId)) {
+            throw new RuntimeException("You can only update your own account");
+        }
+
+        if (updatedUser.getFirstname() != null) user.setFirstname(updatedUser.getFirstname());
+        if (updatedUser.getLastname() != null) user.setLastname(updatedUser.getLastname());
+        if (updatedUser.getEmail() != null) user.setEmail(updatedUser.getEmail());
+        if (updatedUser.getPassword() != null && !updatedUser.getPassword().isEmpty()) {
+            user.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
+        }
+        if (updatedUser.getRole() != null) user.setRole(updatedUser.getRole());
+
+        return repository.save(user);
+    }
+
+    public void deleteUser(Long id, Long currentUserId) {
+        User user = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (!user.getId().equals(currentUserId)) {
+            throw new RuntimeException("You can only delete your own account");
+        }
+
+        repository.deleteById(id);
     }
 }

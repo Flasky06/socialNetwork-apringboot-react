@@ -1,6 +1,7 @@
 package com.bony.security.services;
 
-
+import com.bony.security.exception.ResourceNotFoundException;
+import com.bony.security.exception.UnauthorizedActionException;
 import com.bony.security.model.Post;
 import com.bony.security.model.User;
 import com.bony.security.repositories.PostRepository;
@@ -18,36 +19,43 @@ public class PostService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
 
-    public Post createPost(Post post, Integer userId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+    public Post createPost(Post post, Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
         post.setUser(user);
         return postRepository.save(post);
     }
 
-
-
-
-    // In PostService
-    public List<Post> getAllPosts() {
-        List<Post> posts = postRepository.findAll();
-        System.out.println("Retrieved posts: " + posts); // Log or debug here
-        return posts;
-    }
-
-
-    public Optional<Post> getPostById(Integer postId) {
+    public Optional<Post> getPostById(Long postId) {
         return postRepository.findById(postId);
     }
 
-    public Post updatePost(Integer postId, Post postDetails) {
-        Post post = postRepository.findById(postId).orElseThrow(() -> new RuntimeException("Post not found"));
-        post.setTitle(postDetails.getTitle());
-        post.setContent(postDetails.getContent());
+    public List<Post> getAllPosts() {
+        return postRepository.findAll();
+    }
+
+    public Post updatePost(Long postId, Post postDetails, Long currentUserId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new ResourceNotFoundException("Post not found"));
+
+        if (!post.getUser().getId().equals(currentUserId)) {
+            throw new UnauthorizedActionException("You can only update your own posts");
+        }
+
+        if (postDetails.getTitle() != null) post.setTitle(postDetails.getTitle());
+        if (postDetails.getContent() != null) post.setContent(postDetails.getContent());
+
         return postRepository.save(post);
     }
 
-    public void deletePost(Integer postId) {
-        Post post = postRepository.findById(postId).orElseThrow(() -> new RuntimeException("Post not found"));
-        postRepository.delete(post);
+    public void deletePost(Long postId, Long currentUserId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new ResourceNotFoundException("Post not found"));
+
+        if (!post.getUser().getId().equals(currentUserId)) {
+            throw new UnauthorizedActionException("You can only delete your own posts");
+        }
+
+        postRepository.deleteById(postId);
     }
 }
