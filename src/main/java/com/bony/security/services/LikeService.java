@@ -1,9 +1,9 @@
 package com.bony.security.services;
 
 
-import com.bony.security.model.Like;
-import com.bony.security.model.Post;
-import com.bony.security.model.User;
+import com.bony.security.entity.Like;
+import com.bony.security.entity.Post;
+import com.bony.security.entity.User;
 import com.bony.security.repositories.LikeRepository;
 import com.bony.security.repositories.PostRepository;
 import com.bony.security.repositories.UserRepository;

@@ -1,6 +1,6 @@
 package com.bony.security.repositories;
 
-import com.bony.security.model.Like;
+import com.bony.security.entity.Like;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface LikeRepository extends JpaRepository<Like, Long> {

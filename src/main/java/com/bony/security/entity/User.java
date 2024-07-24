@@ -1,7 +1,6 @@
-package com.bony.security.model;
+package com.bony.security.entity;
 
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -40,6 +39,7 @@ public class User implements UserDetails {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<Post> posts;
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

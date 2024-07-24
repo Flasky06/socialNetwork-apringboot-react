@@ -2,8 +2,8 @@ package com.bony.security.services;
 
 import com.bony.security.exception.ResourceNotFoundException;
 import com.bony.security.exception.UnauthorizedActionException;
-import com.bony.security.model.Post;
-import com.bony.security.model.User;
+import com.bony.security.entity.Post;
+import com.bony.security.entity.User;
 import com.bony.security.repositories.PostRepository;
 import com.bony.security.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -26,8 +26,9 @@ public class PostService {
         return postRepository.save(post);
     }
 
-    public Optional<Post> getPostById(Long postId) {
-        return postRepository.findById(postId);
+    public Post getPostById(Long id) {
+        return postRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Post not found with id: " + id));
     }
 
     public List<Post> getAllPosts() {
@@ -57,5 +58,10 @@ public class PostService {
         }
 
         postRepository.deleteById(postId);
+    }
+
+    public Post getPostWithComments(Long postId) {
+        return postRepository.findById(postId)
+                .orElseThrow(() -> new ResourceNotFoundException("Post not found with id " + postId));
     }
 }

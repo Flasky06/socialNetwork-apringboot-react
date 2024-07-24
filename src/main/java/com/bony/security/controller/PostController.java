@@ -1,15 +1,11 @@
 package com.bony.security.controller;
 
-import com.bony.security.model.Comment;
-import com.bony.security.model.Post;
-import com.bony.security.model.User;
-import com.bony.security.services.CommentService;
+import com.bony.security.entity.Post;
 import com.bony.security.services.LikeService;
 import com.bony.security.services.PostService;
+import com.bony.security.utils.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,21 +14,22 @@ import java.util.List;
 @RequestMapping("/api/v1/posts")
 @RequiredArgsConstructor
 public class PostController {
+
     private final PostService postService;
     private final LikeService likeService;
-    private final CommentService commentService;
 
-    @PostMapping("/create/{userId}")
-    public ResponseEntity<Post> createPost(@PathVariable Long userId, @RequestBody Post post) {
-        return ResponseEntity.ok(postService.createPost(post, userId));
+    @PostMapping("/create")
+    public ResponseEntity<Post> createPost(@RequestBody Post post) {
+        Long currentUserId = SecurityUtils.getCurrentUserId();
+        return ResponseEntity.ok(postService.createPost(post, currentUserId));
     }
 
     @GetMapping("/{postId}")
     public ResponseEntity<Post> getPostById(@PathVariable Long postId) {
-        Post post = postService.getPostById(postId)
-                .orElseThrow(() -> new RuntimeException("Post not found"));
+        Post post = postService.getPostById(postId);
         return ResponseEntity.ok(post);
     }
+
 
     @GetMapping("/all")
     public ResponseEntity<List<Post>> getAllPosts() {
@@ -42,20 +39,14 @@ public class PostController {
 
     @PutMapping("/update/{postId}")
     public ResponseEntity<Post> updatePost(@PathVariable Long postId, @RequestBody Post postDetails) {
-        Long currentUserId = getCurrentUserId();
+        Long currentUserId = SecurityUtils.getCurrentUserId();
         return ResponseEntity.ok(postService.updatePost(postId, postDetails, currentUserId));
     }
 
     @DeleteMapping("/delete/{postId}")
     public ResponseEntity<Void> deletePost(@PathVariable Long postId) {
-        Long currentUserId = getCurrentUserId();
+        Long currentUserId = SecurityUtils.getCurrentUserId();
         postService.deletePost(postId, currentUserId);
         return ResponseEntity.noContent().build();
-    }
-
-    private Long getCurrentUserId() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User user = (User) authentication.getPrincipal();
-        return user.getId();
     }
 }

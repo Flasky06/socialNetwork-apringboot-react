@@ -1,6 +1,6 @@
 package com.bony.security.repositories;
 
-import com.bony.security.model.Comment;
+import com.bony.security.entity.Comment;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

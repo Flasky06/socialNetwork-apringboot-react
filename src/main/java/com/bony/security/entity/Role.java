@@ -1,4 +1,4 @@
-package com.bony.security.model;
+package com.bony.security.entity;
 
 public enum Role {
     USER,

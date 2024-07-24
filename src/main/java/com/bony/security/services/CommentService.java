@@ -1,11 +1,13 @@
 package com.bony.security.services;
 
-import com.bony.security.model.Comment;
-import com.bony.security.model.Post;
-import com.bony.security.model.User;
+import com.bony.security.entity.Comment;
+import com.bony.security.entity.Post;
+import com.bony.security.entity.User;
+import com.bony.security.exception.ResourceNotFoundException;
 import com.bony.security.repositories.CommentRepository;
 import com.bony.security.repositories.PostRepository;
 import com.bony.security.repositories.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,22 +21,26 @@ public class CommentService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
 
-    public Comment addComment(Long postId, Long userId, String content) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+    public void addComment(Long postId, Long userId, String content) {
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new RuntimeException("Post not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Post not found"));
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
         Comment comment = Comment.builder()
-                .user(user)
+                .comment(content)
                 .post(post)
-                .content(content)
+                .user(user)
                 .build();
 
-        return commentRepository.save(comment);
+        commentRepository.save(comment);
     }
+
+
 
     public List<Comment> getCommentsByPost(Long postId) {
         return commentRepository.findByPostId(postId);
     }
 }
+

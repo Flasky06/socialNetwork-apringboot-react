@@ -1,6 +1,6 @@
 package com.bony.security.controller;
 
-import com.bony.security.model.User;
+import com.bony.security.entity.User;
 import com.bony.security.services.AuthenticationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
